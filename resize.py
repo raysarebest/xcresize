@@ -18,6 +18,19 @@ if len(sys.argv) >= 3:
 else:
     output_directory = file_path.parent
 
+if output_directory.suffix != ".xcassets":
+    print("The output directory is not an asset bundle. Are you sure you wish to continue? Y/n")
+
+    answer = ""
+    prompt = ">>> "
+    while answer != "y" and answer != "n":
+        answer = input(prompt).lower()
+        prompt = "I don't recognize that answer. Please answer with (y)es or (n)o"
+    
+    if answer == "n":
+        print("Aborted")
+        sys.exit()
+
 if len(sys.argv) >= 4:
     sizes = sys.argv[3]
 else:
