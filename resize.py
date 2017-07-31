@@ -5,23 +5,30 @@ import sys
 
 if len(sys.argv) < 2:
     sys.exit("You must specify a file")
-
-if len(sys.argv) >= 3:
-    sizes = sys.argv[2]
-else:
-    sizes = 3
-
+    
 file_path = Path(sys.argv[1]).resolve()
 
 if not file_path.is_file():
     sys.exit(f"The file \"{file_path}\" was not found")
+
+if len(sys.argv) >= 3:
+    output_directory = Path(sys.argv[2]).resolve()
+    if not output_directory.is_dir():
+        sys.exit(f"The directory \"{output_directory}\" was not found")
+else:
+    output_directory = file_path.parent
+
+if len(sys.argv) >= 4:
+    sizes = sys.argv[3]
+else:
+    sizes = 3
 
 try:
     base = Image.open(str(file_path))
 except OSError:
     sys.exit(f"\"{sys.argv[1]}\" is not an image")
 
-target_directory = file_path.parent / f"{file_path.stem}.imageset"
+target_directory = output_directory / f"{file_path.stem}.imageset"
 target_directory.mkdir(exist_ok=True)
 
 contents_index = {"images": [], "info": {"verson": 1, "author": "xcode"}}
