@@ -2,7 +2,6 @@ from PIL import Image
 from pathlib import Path
 import json
 import sys
-import os
 
 if len(sys.argv) < 2:
     sys.exit("You must specify a file")
