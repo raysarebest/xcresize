@@ -1,5 +1,6 @@
 from PIL import Image
 from pathlib import Path
+import PIL
 import json
 import sys
 
@@ -49,7 +50,7 @@ contents_index = {"images": [], "info": {"verson": 1, "author": "xcode"}}
 for factor in reversed(range(1, sizes + 1)):
     size = tuple(int(dimension * (factor/sizes)) for dimension in base.size)
     new_file = Path(target_directory) / f"{file_path.stem}@{factor}x{file_path.suffix}"
-    base.resize(size).save(str(new_file))
+    base.resize(size, Image.ANTIALIAS).save(str(new_file))
     contents_index["images"].append({"size": f"{size[0]}x{size[1]}", "idiom": "universal", "filename": new_file.name, "scale": f"{factor}x"})
 
 with open(str(target_directory / "Contents.json"), "w") as contents_file:
