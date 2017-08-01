@@ -11,14 +11,20 @@ def __module_for_background__(background):
 def __terminate_color__(string, module):
     return string + module.RESET
 
-def yellow(string, background=False):
-    module = __module_for_background__(background)
-    return __terminate_color__(module.YELLOW + string, module)
+def __colorize__(string, color, reset_colors, module):
+    result = color + string
+    if reset_colors:
+        result = __terminate_color__(result, module)
+    return result
 
-def green(string, background=False):
+def yellow(string, background=False, reset_colors=True):
     module = __module_for_background__(background)
-    return __terminate_color__(module.GREEN + string, module)
+    return __colorize__(string, module.YELLOW, reset_colors, module)
 
-def red(string, background=False):
+def green(string, background=False, reset_colors=True):
     module = __module_for_background__(background)
-    return __terminate_color__(module.RED + string, module)
+    return __colorize__(string, module.GREEN, reset_colors, module)
+
+def red(string, background=False, reset_colors=True):
+    module = __module_for_background__(background)
+    return __colorize__(string, module.RED, reset_colors, module)

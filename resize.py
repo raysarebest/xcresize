@@ -5,46 +5,67 @@ import PIL
 import json
 import sys
 
+def fail(message):
+    sys.exit(colors.red("ERROR: " + message))
+
+def warn(message, confirm=False, confirmation_message=". Do you wish to continue?"):
+    def abort():
+        print(colors.red("Aborted"))
+        sys.exit()
+    print(colors.yellow("WARNING: " + message), end="")
+    if confirm:
+        print(colors.yellow(" " + confirmation_message + " ") + colors.green("Y") + colors.yellow("/") + colors.red("n"))
+        answer = ""
+        prompt = colors.yellow(">>> ")
+        while answer != "y" and answer != "n" and answer != "yes" and answer != "no":
+            try:
+                answer = input(prompt).lower()
+            except KeyboardInterrupt:
+                print()
+                abort()
+            prompt = colors.yellow("I don't recognize that answer. Please answer with (") + colors.green("y") + colors.yellow(")es or (") + colors.red("n") + colors.yellow(")o")
+        if answer == "n":
+            abort()
+    else:
+        print()
+
 if len(sys.argv) < 2:
-    sys.exit("You must specify a file")
+    fail("You must specify a file")
     
 file_path = Path(sys.argv[1]).resolve()
 
 if not file_path.is_file():
-    sys.exit(f"The file \"{file_path}\" was not found")
+    fail(f"The file \"{file_path}\" was not found")
 
 if len(sys.argv) >= 3:
     output_directory = Path(sys.argv[2]).resolve()
     if not output_directory.is_dir():
-        sys.exit(f"The directory \"{output_directory}\" was not found")
+        fail(f"The directory \"{output_directory}\" was not found")
 else:
     output_directory = file_path.parent
 
 if output_directory.suffix != ".xcassets":
-    print(colors.yellow("The output directory is not an asset bundle. Are you sure you wish to continue? ") + colors.green('Y') + colors.yellow("/") + colors.red('n'))
+    warn("The output directory is not an asset bundle")
 
-    answer = ""
-    prompt = ">>> "
-    while answer != "y" and answer != "n":
-        answer = input(prompt).lower()
-        prompt = "I don't recognize that answer. Please answer with (y)es or (n)o"
-    
-    if answer == "n":
-        print("Aborted")
-        sys.exit()
+target_directory = output_directory / f"{file_path.stem}.imageset"
+
+try:
+    target_directory.mkdir()
+except FileExistsError:
+    warn(f"The file \"{target_directory}\" already exists.", confirm=True, confirmation_message="Overwrite?")
 
 if len(sys.argv) >= 4:
-    sizes = sys.argv[3]
+    try:
+        sizes = int(sys.argv[3])
+    except ValueError:
+        fail("The number of sizes must be an integer")
 else:
     sizes = 3
 
 try:
     base = Image.open(str(file_path))
 except OSError:
-    sys.exit(f"\"{sys.argv[1]}\" is not an image")
-
-target_directory = output_directory / f"{file_path.stem}.imageset"
-target_directory.mkdir(exist_ok=True)
+    fail(f"\"{sys.argv[1]}\" is not an image")
 
 contents_index = {"images": [], "info": {"verson": 1, "author": "xcode"}}
 

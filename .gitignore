@@ -101,3 +101,6 @@ ENV/
 # macOS Files
 .DS_Store
 /**/.DS_Store
+
+# Testing artifacts
+*.imageset
