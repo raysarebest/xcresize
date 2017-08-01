@@ -1,5 +1,6 @@
 from PIL import Image
 from pathlib import Path
+import colors
 import PIL
 import json
 import sys
@@ -20,7 +21,7 @@ else:
     output_directory = file_path.parent
 
 if output_directory.suffix != ".xcassets":
-    print("The output directory is not an asset bundle. Are you sure you wish to continue? Y/n")
+    print(colors.yellow("The output directory is not an asset bundle. Are you sure you wish to continue? ") + colors.green('Y') + colors.yellow("/") + colors.red('n'))
 
     answer = ""
     prompt = ">>> "
