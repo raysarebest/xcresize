@@ -44,7 +44,12 @@ if len(sys.argv) >= 3:
 else:
     output_directory = file_path.parent
 
-if output_directory.suffix != ".xcassets":
+should_warn_for_asset_bundle = True
+for part in output_directory.parts:
+    if part.endswith(".xcassets"):
+        should_warn_for_asset_bundle = False
+
+if should_warn_for_asset_bundle:
     warn("The output directory is not an asset bundle")
 
 target_directory = output_directory / f"{file_path.stem}.imageset"
@@ -67,7 +72,7 @@ try:
 except OSError:
     fail(f"\"{sys.argv[1]}\" is not an image")
 
-contents_index = {"images": [], "info": {"verson": 1, "author": "xcode"}}
+contents_index = {"images": [], "info": {"verson": 1, "author": "xcresize"}}
 
 for factor in reversed(range(1, sizes + 1)):
     size = tuple(int(dimension * (factor/sizes)) for dimension in base.size)
