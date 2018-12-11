@@ -48,22 +48,35 @@ should_warn_for_asset_bundle = True
 for part in output_directory.parts:
     if part.endswith(".xcassets"):
         should_warn_for_asset_bundle = False
+        break
 
 if should_warn_for_asset_bundle:
     warn("The output directory is not an asset bundle")
 
-target_directory = output_directory / f"{file_path.stem}.imageset"
+set_name = file_path.stem
+set_name_flag = "--setname"
+if set_name_flag in sys.argv:
+    flag_index = sys.argv.index(set_name_flag)
+    if len(sys.argv) >= flag_index:
+        set_name = sys.argv[flag_index + 1]
+    else:
+        fail(f"{set_name_flag} flag was specified, but no iconset name was provided")
+
+target_directory = output_directory / f"{set_name}.imageset"
 
 try:
     target_directory.mkdir()
 except FileExistsError:
     warn(f"The file \"{target_directory}\" already exists.", confirm=True, confirmation_message="Overwrite?")
 
-if len(sys.argv) >= 4:
+sizes_flag = "--sizes"
+if len(sys.argv) >= 5 and sizes_flag in sys.argv:
     try:
-        sizes = int(sys.argv[3])
+        sizes = int(sys.argv[sys.argv.index(sizes_flag) + 1])
     except ValueError:
         fail("The number of sizes must be an integer")
+    except IndexError:
+        fail(f"{sizes_flag} flag was specified, but no size count was provided")
 else:
     sizes = 3
 
@@ -72,7 +85,7 @@ try:
 except OSError:
     fail(f"\"{sys.argv[1]}\" is not an image")
 
-contents_index = {"images": [], "info": {"verson": 1, "author": "xcresize"}}
+contents_index = {"images": [], "info": {"version": 1, "author": "xcresize"}}
 
 for factor in reversed(range(1, sizes + 1)):
     size = tuple(int(dimension * (factor/sizes)) for dimension in base.size)
